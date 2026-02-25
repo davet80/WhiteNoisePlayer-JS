@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL // W_NOISE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <canvas id="starfield"></canvas>
+
+    <main class="app-container">
+        <div class="hacker-card">
+            <header>
+                <h1>DAVE'S NOISE GEN 1.0</h1>
+                <p>> Initialize audio</p>
+                <div class="status-indicator">
+                    <span class="status-bracket">[</span>
+                    <span class="status-text" id="status-text">OFFLINE</span>
+                    <span class="status-bracket">]</span>
+                </div>
+            </header>
+
+            <section class="controls">
+                <!-- Play/Pause Button -->
+                <div class="control-group center">
+                    <button id="play-btn" class="play-btn" aria-label="Play/Pause">
+                        <span id="play-text">EXECUTE</span>
+                        <span id="pause-text" class="hidden">TERMINATE</span>
+                    </button>
+                </div>
+
+                <!-- Noise Color Selector -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>> SELECT TYPE:</label>
+                    </div>
+                    <div class="segmented-control type-control">
+                        <input type="radio" name="noise-type" id="type-white" value="white" checked>
+                        <label for="type-white">WHITE</label>
+
+                        <input type="radio" name="noise-type" id="type-pink" value="pink">
+                        <label for="type-pink">PINK</label>
+
+                        <input type="radio" name="noise-type" id="type-brown" value="brown">
+                        <label for="type-brown">BROWN</label>
+                    </div>
+                </div>
+
+                <!-- 16 Band EQ -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>> GRAPHIC_EQ:</label>
+                        <button id="eq-reset-btn" class="sm-btn" aria-label="Reset EQ">RESET</button>
+                    </div>
+                    <div class="eq-board" id="eq-board">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Master Volume Slider -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>> MASTER_VOL:</label>
+                        <span id="vol-display" class="value-display">50%</span>
+                    </div>
+                    <input type="range" id="vol-slider" min="0" max="100" value="50" class="custom-slider">
+                </div>
+
+                <!-- Frequency Range Filter -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>> FILTER_FREQ:</label>
+                        <span id="freq-display" class="value-display">1000 HZ</span>
+                    </div>
+                    <input type="range" id="freq-slider" min="0" max="100" value="50" class="custom-slider">
+                    <div class="slider-labels">
+                        <span>0060 HZ</span>
+                        <span>8000 HZ</span>
+                    </div>
+                </div>
+
+                <!-- Stereo Width Selector -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>> STEREO_WIDTH:</label>
+                    </div>
+                    <div class="segmented-control">
+                        <input type="radio" name="width" id="width-mono" value="0">
+                        <label for="width-mono">MONO</label>
+
+                        <input type="radio" name="width" id="width-narrow" value="0.5">
+                        <label for="width-narrow">NARROW</label>
+
+                        <input type="radio" name="width" id="width-normal" value="1.0" checked>
+                        <label for="width-normal">NORMAL</label>
+
+                        <input type="radio" name="width" id="width-wide" value="1.5">
+                        <label for="width-wide">WIDE</label>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
