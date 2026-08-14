@@ -2,6 +2,8 @@
 
 A no-build, vanilla-JS ambient noise generator built on the Web Audio API, with a starfield backdrop.
 
+**Live:** <https://davet80.github.io/WhiteNoisePlayer-JS/>
+
 ![status](https://img.shields.io/badge/dependencies-none-6ee7d8)
 
 ## Features
