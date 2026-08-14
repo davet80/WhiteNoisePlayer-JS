@@ -213,11 +213,17 @@ const PRESETS = {
     // freq is the slider position (0-100 on the 60 Hz – 8 kHz log scale)
     sleep: { type: 'brown', width: 0.5, vol: 40, freq: 19, eq: FLAT_EQ, swell: true },   // ~150 Hz cutoff
     focus: { type: 'pink',  width: 1.0, vol: 55, freq: 72, eq: FLAT_EQ, swell: false },  // ~2 kHz cutoff
-    rain:  { type: 'brown', width: 1.0, vol: 60, freq: 55, eq: [0, 0, 1, 2, 3, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0], swell: false } // ~900 Hz cutoff
+    // Pink noise keeps the high-frequency "patter" that reads as rainfall;
+    // the low-mid bump adds body, the ~1.2 kHz cutoff tames the hiss
+    rain:  { type: 'pink',  width: 1.5, vol: 60, freq: 61, eq: [0, 0, 1, 2, 3, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0], swell: false }
 };
 
 presetBtns.forEach(btn => {
-    btn.addEventListener('click', () => applySettings(PRESETS[btn.dataset.preset]));
+    btn.addEventListener('click', () => {
+        applySettings(PRESETS[btn.dataset.preset]);
+        // A preset is a request to hear something — start playback if stopped
+        if (!isPlaying) setPlaying(true);
+    });
 });
 
 // --- UI Builders ---
