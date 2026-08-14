@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DT Noise Gen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=3">
+</head>
+
+<body>
+    <canvas id="starfield"></canvas>
+
+    <main class="app-container">
+        <div class="hacker-card">
+            <header>
+                <div class="brand-row">
+                    <h1>DT NOISE GEN</h1>
+                    <span class="version-chip">v1.1</span>
+                </div>
+                <p class="tagline">Ambient Noise Engine</p>
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text" id="status-text">OFFLINE</span>
+                </div>
+            </header>
+
+            <section class="controls">
+                <!-- Play/Pause Button -->
+                <div class="control-group center">
+                    <button id="play-btn" class="play-btn" aria-label="Play/Pause">
+                        <span id="play-text">PLAY</span>
+                        <span id="pause-text" class="hidden">STOP</span>
+                    </button>
+                </div>
+
+                <!-- Presets -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Presets</label>
+                    </div>
+                    <div class="preset-row">
+                        <button class="preset-btn" data-preset="sleep">SLEEP</button>
+                        <button class="preset-btn" data-preset="focus">FOCUS</button>
+                        <button class="preset-btn" data-preset="rain">RAIN</button>
+                    </div>
+                </div>
+
+                <!-- Noise Color Selector -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Noise Type</label>
+                    </div>
+                    <div class="segmented-control type-control">
+                        <input type="radio" name="noise-type" id="type-white" value="white" checked>
+                        <label for="type-white">WHITE</label>
+
+                        <input type="radio" name="noise-type" id="type-pink" value="pink">
+                        <label for="type-pink">PINK</label>
+
+                        <input type="radio" name="noise-type" id="type-brown" value="brown">
+                        <label for="type-brown">BROWN</label>
+
+                        <input type="radio" name="noise-type" id="type-blue" value="blue">
+                        <label for="type-blue">BLUE</label>
+
+                        <input type="radio" name="noise-type" id="type-violet" value="violet">
+                        <label for="type-violet">VIOLET</label>
+
+                        <input type="radio" name="noise-type" id="type-grey" value="grey">
+                        <label for="type-grey">GREY</label>
+                    </div>
+                </div>
+
+                <!-- 16 Band EQ -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Graphic EQ</label>
+                        <button id="eq-reset-btn" class="sm-btn" aria-label="Reset EQ">Reset</button>
+                    </div>
+                    <div class="eq-board" id="eq-board">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Master Volume Slider -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Master Volume</label>
+                        <span id="vol-display" class="value-display">50%</span>
+                    </div>
+                    <input type="range" id="vol-slider" min="0" max="100" value="50" class="custom-slider">
+                </div>
+
+                <!-- Frequency Range Filter -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Filter Cutoff</label>
+                        <span id="freq-display" class="value-display">693 Hz</span>
+                    </div>
+                    <input type="range" id="freq-slider" min="0" max="100" value="50" class="custom-slider">
+                    <div class="slider-labels">
+                        <span>60 Hz</span>
+                        <span>8 kHz</span>
+                    </div>
+                </div>
+
+                <!-- Stereo Width Selector -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Stereo Width</label>
+                    </div>
+                    <div class="segmented-control">
+                        <input type="radio" name="width" id="width-mono" value="0">
+                        <label for="width-mono">MONO</label>
+
+                        <input type="radio" name="width" id="width-narrow" value="0.5">
+                        <label for="width-narrow">NARROW</label>
+
+                        <input type="radio" name="width" id="width-normal" value="1.0" checked>
+                        <label for="width-normal">NORMAL</label>
+
+                        <input type="radio" name="width" id="width-wide" value="1.5">
+                        <label for="width-wide">WIDE</label>
+                    </div>
+                </div>
+
+                <!-- Sleep Timer -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label>Sleep Timer</label>
+                        <span id="sleep-display" class="value-display">OFF</span>
+                    </div>
+                    <div class="segmented-control">
+                        <input type="radio" name="sleep" id="sleep-off" value="0" checked>
+                        <label for="sleep-off">OFF</label>
+
+                        <input type="radio" name="sleep" id="sleep-15" value="15">
+                        <label for="sleep-15">15 MIN</label>
+
+                        <input type="radio" name="sleep" id="sleep-30" value="30">
+                        <label for="sleep-30">30 MIN</label>
+
+                        <input type="radio" name="sleep" id="sleep-60" value="60">
+                        <label for="sleep-60">60 MIN</label>
+                    </div>
+                </div>
+
+                <!-- Ocean Swell LFO -->
+                <div class="control-group">
+                    <div class="control-header">
+                        <label for="swell-toggle">Ocean Swell</label>
+                        <span class="switch">
+                            <input type="checkbox" id="swell-toggle">
+                            <label for="swell-toggle" class="switch-track" aria-label="Toggle ocean swell"><span
+                                    class="switch-thumb"></span></label>
+                        </span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js?v=3"></script>
+</body>
+
+</html>
