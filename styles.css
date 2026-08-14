@@ -454,7 +454,7 @@ label {
 /* Noise color swatches */
 .type-control {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
 }
 
 .type-control label::before {
@@ -471,6 +471,8 @@ label {
 .type-control label[for="type-blue"]::before   { background: #7aa5ff; }
 .type-control label[for="type-violet"]::before { background: #b48ce8; }
 .type-control label[for="type-grey"]::before   { background: #9aa3ad; }
+.type-control label[for="type-ocean"]::before  { background: #4dd0c4; }
+.type-control label[for="type-storm"]::before  { background: #5b6d94; }
 
 /* Preset buttons */
 .preset-row {
@@ -549,9 +551,35 @@ label {
     }
 }
 
+/* Sample credits */
+.credits {
+    margin-top: 26px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+.credits a {
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--text-muted);
+}
+
+.credits a:hover {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
 @media (max-width: 480px) {
     .hacker-card {
         padding: 26px 18px;
+    }
+
+    .type-control {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     h1 {

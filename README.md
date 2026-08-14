@@ -9,6 +9,7 @@ A no-build, vanilla-JS ambient noise generator built on the Web Audio API, with 
 ## Features
 
 - **Six noise colors** — white, pink (Paul Kellet filter), brown (leaky integrator), blue, violet, and grey (psychoacoustic approximation), all generated in-browser as seamless 5-second loops with seam crossfading
+- **Two field recordings** — ocean waves and a rain/thunder storm, loaded lazily and looped with a crossfaded seam; the EQ, filter, width, and swell controls shape them just like the generated colors
 - **16-band graphic EQ** (20 Hz – 20 kHz peaking filters)
 - **Sweepable low-pass filter** (60 Hz – 8 kHz, log scale)
 - **Mid/side stereo width** control (mono → wide) with headroom compensation
@@ -30,3 +31,8 @@ python3 -m http.server 8734
 then open <http://localhost:8734>.
 
 No dependencies, no build step. The `?v=N` query strings on the CSS/JS links are cache-busters — bump them if you edit those files.
+
+## Audio sample credits
+
+- `samples/ocean.ogg` — ["Oceanwavescrushing"](https://commons.wikimedia.org/wiki/File:Oceanwavescrushing.ogg) by Luftrum, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), via Wikimedia Commons
+- `samples/storm.ogg` — ["Rain and thunder (1)"](https://commons.wikimedia.org/wiki/File:Rain_and_thunder_(1).ogg) by ezwa, public domain, via Wikimedia Commons

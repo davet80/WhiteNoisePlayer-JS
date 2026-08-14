@@ -24,15 +24,29 @@ let isPlaying = false;
 let currentWidth = 1.0;
 let currentNoiseType = 'white'; // white | pink | brown | blue | violet | grey
 
-// Audio Buffers (generated lazily per type on first use)
+// Audio Buffers (generated or fetched lazily per type on first use)
 let buffers = {
     white: null,
     pink: null,
     brown: null,
     blue: null,
     violet: null,
-    grey: null
+    grey: null,
+    ocean: null,
+    storm: null
 };
+
+// Field-recording sample types (fetched + decoded rather than generated).
+// Credits: ocean — "Oceanwavescrushing" by Luftrum (CC BY 3.0, Wikimedia
+// Commons); storm — "Rain and thunder (1)" by ezwa (public domain).
+const SAMPLE_URLS = {
+    ocean: 'samples/ocean.ogg',
+    storm: 'samples/storm.ogg'
+};
+
+// Per-type loop end (seconds) for sample buffers — the crossfaded tail region
+// is excluded from the loop, so playback wraps into the blended head
+const sampleLoopEnd = {};
 
 // --- DOM Elements ---
 const playBtn = document.getElementById('play-btn');
@@ -380,6 +394,32 @@ function createNoiseGenerator(type) {
     }
 }
 
+// For decoded samples we can't generate a continuation past the end, so
+// instead the head is crossfaded with the tail and the loop region shortened
+// to end where the borrowed tail begins — the wrap lands exactly on the
+// blended head, so it stays continuous.
+function prepareSampleLoop(type, buffer) {
+    const F = Math.min(SEAM_FADE_SAMPLES * 4, Math.floor(buffer.length / 8)); // ~0.2 s blend
+    const N = buffer.length;
+    for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+        const data = buffer.getChannelData(channel);
+        for (let i = 0; i < F; i++) {
+            const w = i / F;
+            data[i] = data[i] * w + data[N - F + i] * (1 - w);
+        }
+    }
+    sampleLoopEnd[type] = (N - F) / buffer.sampleRate;
+    buffers[type] = buffer;
+}
+
+async function loadSampleBuffer(type) {
+    const resp = await fetch(SAMPLE_URLS[type]);
+    if (!resp.ok) throw new Error(`sample fetch failed: ${resp.status}`);
+    const data = await resp.arrayBuffer();
+    const decoded = await audioCtx.decodeAudioData(data);
+    prepareSampleLoop(type, decoded);
+}
+
 function generateNoiseBuffer(type) {
     const bufferSize = audioCtx.sampleRate * 5; // 5 seconds
     const buffer = audioCtx.createBuffer(2, bufferSize, audioCtx.sampleRate);
@@ -524,12 +564,35 @@ function setupMidSideRouting() {
 
 const FADE_TIME = 0.06; // seconds — click-free start/stop/swap ramp
 
-function startSound() {
+// Guards against a slow sample download finishing after the user has already
+// switched to something else or pressed stop
+let startToken = 0;
+
+async function startSound() {
     if (!audioCtx) initAudio();
     // 'interrupted' (iOS after a call/Siri) and 'suspended' both need a resume
     if (audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
 
-    if (!buffers[currentNoiseType]) generateNoiseBuffer(currentNoiseType);
+    const type = currentNoiseType;
+    const token = ++startToken;
+
+    if (!buffers[type]) {
+        if (SAMPLE_URLS[type]) {
+            statusText.textContent = 'LOADING';
+            try {
+                await loadSampleBuffer(type);
+            } catch (e) {
+                if (token === startToken) statusText.textContent = 'ERROR';
+                return;
+            }
+        } else {
+            generateNoiseBuffer(type);
+        }
+    }
+
+    // Superseded while loading (new selection, or user pressed stop)
+    if (token !== startToken || !isPlaying) return;
+    statusText.textContent = 'ONLINE';
 
     const now = audioCtx.currentTime;
     let startAt = now;
@@ -549,8 +612,9 @@ function startSound() {
     }
 
     sourceNode = audioCtx.createBufferSource();
-    sourceNode.buffer = buffers[currentNoiseType];
+    sourceNode.buffer = buffers[type];
     sourceNode.loop = true;
+    if (sampleLoopEnd[type]) sourceNode.loopEnd = sampleLoopEnd[type];
     sourceNode.connect(eqNodes[0]);
     sourceNode.start(startAt);
 
@@ -605,7 +669,7 @@ function updateMediaSession() {
     if (!('mediaSession' in navigator)) return;
     navigator.mediaSession.metadata = new MediaMetadata({
         title: 'DT Noise Gen',
-        artist: `${currentNoiseType} noise`
+        artist: SAMPLE_URLS[currentNoiseType] ? currentNoiseType : `${currentNoiseType} noise`
     });
     navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
 }
