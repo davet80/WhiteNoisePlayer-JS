@@ -394,6 +394,40 @@ function createNoiseGenerator(type) {
     }
 }
 
+// Field recordings are typically far quieter than full-scale generated noise,
+// so boost them to a comparable loudness. RMS-targeted with a peak cap:
+// quiet rain gets lifted until the loudest transient (a thunder clap)
+// approaches full scale, never past it.
+const SAMPLE_TARGET_RMS = 0.15;
+
+function normalizeSampleBuffer(buffer) {
+    let sumSquares = 0;
+    let peak = 0;
+    let count = 0;
+    for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+        const data = buffer.getChannelData(channel);
+        for (let i = 0; i < data.length; i++) {
+            const v = data[i];
+            sumSquares += v * v;
+            const a = Math.abs(v);
+            if (a > peak) peak = a;
+        }
+        count += data.length;
+    }
+    const rms = Math.sqrt(sumSquares / count);
+    if (!rms || !peak) return;
+
+    const scale = Math.min(SAMPLE_TARGET_RMS / rms, 0.95 / peak);
+    if (scale <= 1) return; // already loud enough — never attenuate
+
+    for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+        const data = buffer.getChannelData(channel);
+        for (let i = 0; i < data.length; i++) {
+            data[i] *= scale;
+        }
+    }
+}
+
 // For decoded samples we can't generate a continuation past the end, so
 // instead the head is crossfaded with the tail and the loop region shortened
 // to end where the borrowed tail begins — the wrap lands exactly on the
@@ -417,6 +451,7 @@ async function loadSampleBuffer(type) {
     if (!resp.ok) throw new Error(`sample fetch failed: ${resp.status}`);
     const data = await resp.arrayBuffer();
     const decoded = await audioCtx.decodeAudioData(data);
+    normalizeSampleBuffer(decoded);
     prepareSampleLoop(type, decoded);
 }
 
