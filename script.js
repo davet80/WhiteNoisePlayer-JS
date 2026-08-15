@@ -76,7 +76,7 @@ const ctx = canvas.getContext('2d');
 
 // --- Math & Mappings ---
 const MIN_FREQ = 60;
-const MAX_FREQ = 8000;
+const MAX_FREQ = 20000; // fully open ≈ bypass — nothing audible above this
 
 function calculateFrequency(linearValue) {
     const minLog = Math.log(MIN_FREQ);
@@ -225,11 +225,11 @@ const FLAT_EQ = new Array(eqBands.length).fill(0);
 
 const PRESETS = {
     // freq is the slider position (0-100 on the 60 Hz – 8 kHz log scale)
-    sleep: { type: 'brown', width: 0.5, vol: 40, freq: 19, eq: FLAT_EQ, swell: true },   // ~150 Hz cutoff
-    focus: { type: 'pink',  width: 1.0, vol: 55, freq: 72, eq: FLAT_EQ, swell: false },  // ~2 kHz cutoff
+    sleep: { type: 'brown', width: 0.5, vol: 40, freq: 16, eq: FLAT_EQ, swell: true },   // ~150 Hz cutoff
+    focus: { type: 'pink',  width: 1.0, vol: 55, freq: 60, eq: FLAT_EQ, swell: false },  // ~2 kHz cutoff
     // Pink noise keeps the high-frequency "patter" that reads as rainfall;
     // the low-mid bump adds body, the ~1.2 kHz cutoff tames the hiss
-    rain:  { type: 'pink',  width: 1.5, vol: 60, freq: 61, eq: [0, 0, 1, 2, 3, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0], swell: false }
+    rain:  { type: 'pink',  width: 1.5, vol: 60, freq: 52, eq: [0, 0, 1, 2, 3, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0], swell: false }
 };
 
 presetBtns.forEach(btn => {
@@ -446,11 +446,22 @@ function prepareSampleLoop(type, buffer) {
     buffers[type] = buffer;
 }
 
+// A mono buffer entering the mid/side matrix collapses to the left channel
+// (mid and side cancel on the right at width 1), so duplicate it to stereo
+function upmixToStereo(buffer) {
+    if (buffer.numberOfChannels >= 2) return buffer;
+    const stereo = audioCtx.createBuffer(2, buffer.length, buffer.sampleRate);
+    const src = buffer.getChannelData(0);
+    stereo.getChannelData(0).set(src);
+    stereo.getChannelData(1).set(src);
+    return stereo;
+}
+
 async function loadSampleBuffer(type) {
     const resp = await fetch(SAMPLE_URLS[type]);
     if (!resp.ok) throw new Error(`sample fetch failed: ${resp.status}`);
     const data = await resp.arrayBuffer();
-    const decoded = await audioCtx.decodeAudioData(data);
+    const decoded = upmixToStereo(await audioCtx.decodeAudioData(data));
     normalizeSampleBuffer(decoded);
     prepareSampleLoop(type, decoded);
 }
