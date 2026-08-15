@@ -37,11 +37,13 @@ let buffers = {
 };
 
 // Field-recording sample types (fetched + decoded rather than generated).
+// MP3 decodes everywhere including Safari, unlike Ogg Vorbis.
 // Credits: ocean — "Oceanwavescrushing" by Luftrum (CC BY 3.0, Wikimedia
-// Commons); storm — "Rain and thunder (1)" by ezwa (public domain).
+// Commons); storm — "Thunderstorm after hot summer day" by stephan
+// (public domain, Wikimedia Commons).
 const SAMPLE_URLS = {
-    ocean: 'samples/ocean.ogg',
-    storm: 'samples/storm.ogg'
+    ocean: 'samples/ocean.mp3',
+    storm: 'samples/storm.mp3'
 };
 
 // Per-type loop end (seconds) for sample buffers — the crossfaded tail region

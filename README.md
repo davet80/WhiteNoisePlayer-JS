@@ -34,5 +34,5 @@ No dependencies, no build step. The `?v=N` query strings on the CSS/JS links are
 
 ## Audio sample credits
 
-- `samples/ocean.ogg` — ["Oceanwavescrushing"](https://commons.wikimedia.org/wiki/File:Oceanwavescrushing.ogg) by Luftrum, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), via Wikimedia Commons
-- `samples/storm.ogg` — ["Rain and thunder (1)"](https://commons.wikimedia.org/wiki/File:Rain_and_thunder_(1).ogg) by ezwa, public domain, via Wikimedia Commons
+- `samples/ocean.mp3` — ["Oceanwavescrushing"](https://commons.wikimedia.org/wiki/File:Oceanwavescrushing.ogg) by Luftrum, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/), via Wikimedia Commons (re-encoded to MP3)
+- `samples/storm.mp3` — ["Thunderstorm after hot summer day (part 3 of 4)"](https://commons.wikimedia.org/wiki/File:Thunderstorm_after_hot_summer_day_17_minutes_03_of_04.ogg) by stephan, public domain, via Wikimedia Commons (re-encoded to MP3)
